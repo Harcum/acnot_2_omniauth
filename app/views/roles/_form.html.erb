@@ -1,0 +1,124 @@
+
+<%= form_for(role) do |f| %>
+  <% if role.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>
+
+      <ul>
+      <% role.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-1">
+	  		<div class="field">
+			    <%= f.label :code %>
+			    <%= f.text_field :code %>
+  			</div>
+  		</div>
+  		<div class="col-md-2">
+	  		<div class="field">
+			    <%= f.label :description %>
+			    <%= f.text_field :description %>
+  			</div>
+  		</div>
+		<div class="col-md-1">
+  	  		<div class="field">
+			    <%= f.label :use_ss , 'Choose by Section' %>
+			    <%= f.check_box :use_ss %>
+  			</div>
+  		</div>
+		<div class="col-md-1">
+  	  		<div class="field">
+			    <%= f.label :see_all_notifications, 'See All Notifications' %>
+			    <%= f.check_box :see_all_notifications %>
+  			</div>
+  		</div>
+  		<div class="col-md-1">
+  	  		<div class="field">
+			    <%= f.label :see_all_students, 'Select Any Student' %>
+			    <%= f.check_box :see_all_students %>
+  			</div>
+  		</div>
+  		<div class="col-md-1">
+  	  		<div class="field">
+			    <%= f.label :has_pool, 'Has Pool' %>
+			    <%= f.check_box :has_pool %>
+  			</div>
+  		</div>
+  		<div class="col-md-2">
+  	  		<div class="field">
+				<%= f.label :pool_display_name, 'Pool Display Name' %>
+    			<%= f.text_field :pool_display_name %>
+    		</div>
+  		</div>
+  		<div class="col-md-2">
+  			<strong>Default Assignee</strong>
+  			<%= f.collection_select(:default_assignee_id, role.people.all, :id, :full_name) %>
+  		</div>
+	</div>
+</div>
+
+<strong>Actions</strong>
+<div class="row"> 	
+	<strong><div class="col-md-2"></div><div class="col-md-1">Selectable</div><div class="col-md-1">Viewable</div><div class="col-md-1">Assignable</div></strong>
+</div>
+
+<% ActionType.all.each do |action| %>
+<div class="row"> 	
+	<div class="col-md-2">
+        <strong><%= h action.code -%></strong>
+	</div>
+	<div class="col-md-1">
+      	<%= check_box_tag "role[selectable_action_ids][]", action.id, f.object.selectable_actions.include?(action) %>
+   </div>
+   <div class="col-md-1">
+      	<%= check_box_tag "role[viewable_action_ids][]", action.id, f.object.viewable_actions.include?(action) %>
+    </div>
+   	<div class="col-md-1">     	
+		<%= check_box_tag "role[assignable_action_ids][]", action.id, f.object.assignable_actions.include?(action) %>
+	</div>
+</div>
+<% end %>
+<br/>
+<strong>Reasons</strong>
+<div class="row"> 	
+	<strong><div class="col-md-2"></div><div class="col-md-1">Selectable</div><div class="col-md-1">Viewable</div></strong>
+</div>
+
+<% Reason.all.each do |reason| %>
+<div class="row"> 	
+	<div class="col-md-2">
+		<strong><%= h reason.code -%></strong>
+	</div>
+	<div class="col-md-1">
+		<%= check_box_tag "role[selectable_reason_ids][]", reason.id, f.object.selectable_reasons.include?(reason) %>
+	</div>
+	<div class="col-md-1">
+      	<%= check_box_tag "role[viewable_reason_ids][]", reason.id, f.object.viewable_reasons.include?(reason) %>
+    </div>   
+</div>
+<% end %>
+
+<br/>
+<strong>Users in Role</strong>
+<br/><br/>
+	
+  <div id='people_roles'>
+    <%= f.fields_for :people_roles do |people_role| %>
+      <%= render 'people_role_fields', :f => people_role %>
+    <% end %>
+
+    <div class='links'>
+      <%= link_to_add_association 'add person', f, :people_roles %>
+    </div>
+  </div>
+<br/>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

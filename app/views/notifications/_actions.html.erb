@@ -1,0 +1,8 @@
+
+
+			<a href="#" class="tabbed" data-toggle="tooltip" data-html="true" title="<% n.notification_actions.each do |a| %><%= a.display %> 
+<% end %>"><% if n.notification_actions.count > 0 %><%= n.notification_actions.first.action_type.code %><% if n.notification_actions.count > 1 %>...<% else %><% end %><% end %></a>
+
+
+
+		

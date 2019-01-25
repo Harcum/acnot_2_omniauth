@@ -1,0 +1,48 @@
+
+<h1>Charge Credit</h1>
+
+<b>Name: </b><%= @people_terms_bills.first.person.first_name %> <%= @people_terms_bills.first.person.last_name %><br/><br/>
+<div class="container-fluid">
+    <% @people_terms_bills.each do |people_term| %>
+
+	    <div class="row"><b>
+	      <div class="col-sm-1">Charges:</div>
+	    </b></div>
+	    <% people_term.charge_credits.where("cc_type = 'charge'").each do |charge_credit| %>
+			<div class="row">
+	      		<div class="col-sm-2"><%= charge_credit.entry_date %></div>
+	        	<div class="col-sm-2"><%= people_term.term.academic_year %>/<%= people_term.term.academic_term %></div>
+	        	<div class="col-sm-6"><%= charge_credit.description %></div>
+	        	<div class="col-sm-2"><%= number_to_currency(charge_credit.amount) %></div>
+	      	</div>
+	    <% end %>
+	   	<div class="row"><b>
+	   		<div class="col-sm-4"></div>
+	      	<div class="col-sm-6">Total Charges:</div>
+	      	<div class="col-sm-2"><%= number_to_currency(people_term.charge_credits.where("cc_type = 'charge'").sum(:amount)) %></div>
+	    </b></div>
+	    <div class="row"><b>
+	      <div class="col-sm-2">Credits:</div>
+	    </b></div>
+	    <% people_term.charge_credits.where("cc_type = 'credit'").each do |charge_credit| %>
+			<div class="row">
+	      		<div class="col-sm-2"><%= charge_credit.entry_date %></div>
+	        	<div class="col-sm-2"><%= people_term.term.academic_year %>/<%= people_term.term.academic_term %></div>
+	        	<div class="col-sm-6"><%= charge_credit.description %></div>
+	        	<div class="col-sm-2"><%= number_to_currency(charge_credit.amount) %></div>
+	      	</div>
+	    <% end %>
+	   	<div class="row"><b>
+	   		<div class="col-sm-4"></div>
+	      	<div class="col-sm-6">Total Credits:</div>
+	      	<div class="col-sm-2"><%= number_to_currency(people_term.charge_credits.where("cc_type = 'credit'").sum(:amount)) %></div>
+	    </b></div>
+		<div class="row"><b>
+	   		<div class="col-sm-4"></div>
+	      	<div class="col-sm-6">Current Balance:</div>
+	      	<div class="col-sm-2"><%= number_to_currency(people_term.charge_credits.where("cc_type = 'credit'").sum(:amount) - people_term.charge_credits.where("cc_type = 'charge'").sum(:amount)) %></div>
+	    </b></div>
+		<br/>
+    <% end %>
+</div>
+

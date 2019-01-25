@@ -1,0 +1,59 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Student Attributes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Birth date</th>
+      <th>Curriculum</th>
+      <th>Address line 1</th>
+      <th>Address line 2</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Zip code</th>
+      <th>Matric date</th>
+      <th>Resident commuter</th>
+      <th>Emergency contact name</th>
+      <th>Emergency contact number</th>
+      <th>Emergency contact relationship</th>
+      <th>Advisor</th>
+      <th>Personal email</th>
+      <th>Harcum email</th>
+      <th>Phone numbers</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @student_attributes.each do |student_attribute| %>
+      <tr>
+        <td><%= student_attribute.id %></td>
+        <td><%= student_attribute.birth_date %></td>
+        <td><%= student_attribute.curriculum %></td>
+        <td><%= student_attribute.address_line_1 %></td>
+        <td><%= student_attribute.address_line_2 %></td>
+        <td><%= student_attribute.city %></td>
+        <td><%= student_attribute.state %></td>
+        <td><%= student_attribute.zip_code %></td>
+        <td><%= student_attribute.matric_date %></td>
+        <td><%= student_attribute.resident_commuter %></td>
+        <td><%= student_attribute.emergency_contact_name %></td>
+        <td><%= student_attribute.emergency_contact_number %></td>
+        <td><%= student_attribute.emergency_contact_relationship %></td>
+        <td><%= student_attribute.advisor %></td>
+        <td><%= student_attribute.personal_email %></td>
+        <td><%= student_attribute.harcum_email %></td>
+        <td><%= student_attribute.phone_numbers %></td>
+        <td><%= link_to 'Show', student_attribute %></td>
+        <td><%= link_to 'Edit', edit_student_attribute_path(student_attribute) %></td>
+        <td><%= link_to 'Destroy', student_attribute, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Student Attribute', new_student_attribute_path %>

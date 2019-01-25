@@ -1,0 +1,4 @@
+<div class = "field">
+	<%= f.label field.name %>
+	<%= f.collection_select(field.name, field.reason_field_choices.all(), :choice, :choice, {:prompt => true}) %>
+</div>

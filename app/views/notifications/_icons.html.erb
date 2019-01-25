@@ -1,0 +1,36 @@
+					
+				<% if nv %>
+					<% if nv.reason || nv.advisor || nv.assignee || nv.creator%>
+						<%= link_to 'Edit', edit_notification_path(:id => n.id) %>
+					<% elsif nv.in_pool %>
+						<%= link_to 'Take', edit_notification_path(:id => n.id) + '?subaction=take' %>
+					<% else %> 
+						<%= link_to 'View', notification_path(:id => n.id) %>
+					<% end %>
+					<% if nv.creator %>
+						<a href="#" data-toggle="tooltip" title="Notification was created by you."><%= image_tag("creator.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.reason || 
+							nv.action %>
+						<a href="#" data-toggle="tooltip" title="You can view notifications like this."><%= image_tag("viewer.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.assignee %>
+						<a href="#" data-toggle="tooltip" title="You have action(s) on this notification."><%= image_tag("action.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.advisor %>
+						<a href="#" data-toggle="tooltip" title="This is your advisee."><%= image_tag("advisor.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.instuctor %>
+						<a href="#" data-toggle="tooltip" title="This is your student."><%= image_tag("instructor.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.in_pool %>
+						<a href="#" data-toggle="tooltip" title="Action(s) on this notification are in your pool."><%= image_tag("pool.png", size: "20x20") %></a>
+					<% end %>
+					<% if nv.informed %>
+						<a href="#" data-toggle="tooltip" title="You are an informed party for this student"><%= image_tag("watch.png", size: "20x20") %></a>
+					<% end %>
+
+				
+
+				
+				<% end %>

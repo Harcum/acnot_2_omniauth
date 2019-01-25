@@ -1,0 +1,2 @@
+module TranscriptGpasHelper
+end

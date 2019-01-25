@@ -1,0 +1,102 @@
+<%= form_for(student_attribute) do |f| %>
+  <% if student_attribute.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(student_attribute.errors.count, "error") %> prohibited this student_attribute from being saved:</h2>
+
+      <ul>
+      <% student_attribute.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :id %>
+    <%= f.number_field :id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :birth_date %>
+    <%= f.date_select :birth_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :curriculum %>
+    <%= f.text_field :curriculum %>
+  </div>
+
+  <div class="field">
+    <%= f.label :address_line_1 %>
+    <%= f.text_field :address_line_1 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :address_line_2 %>
+    <%= f.text_field :address_line_2 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :city %>
+    <%= f.text_field :city %>
+  </div>
+
+  <div class="field">
+    <%= f.label :state %>
+    <%= f.text_field :state %>
+  </div>
+
+  <div class="field">
+    <%= f.label :zip_code %>
+    <%= f.text_field :zip_code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :matric_date %>
+    <%= f.date_select :matric_date %>
+  </div>
+
+  <div class="field">
+    <%= f.label :resident_commuter %>
+    <%= f.text_field :resident_commuter %>
+  </div>
+
+  <div class="field">
+    <%= f.label :emergency_contact_name %>
+    <%= f.text_field :emergency_contact_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :emergency_contact_number %>
+    <%= f.text_field :emergency_contact_number %>
+  </div>
+
+  <div class="field">
+    <%= f.label :emergency_contact_relationship %>
+    <%= f.text_field :emergency_contact_relationship %>
+  </div>
+
+  <div class="field">
+    <%= f.label :advisor %>
+    <%= f.text_field :advisor %>
+  </div>
+
+  <div class="field">
+    <%= f.label :personal_email %>
+    <%= f.text_field :personal_email %>
+  </div>
+
+  <div class="field">
+    <%= f.label :harcum_email %>
+    <%= f.text_field :harcum_email %>
+  </div>
+
+  <div class="field">
+    <%= f.label :phone_numbers %>
+    <%= f.text_field :phone_numbers %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

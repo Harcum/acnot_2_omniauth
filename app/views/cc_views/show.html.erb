@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Id:</strong>
+  <%= @cc_view.id %>
+</p>
+
+<p>
+  <strong>Display:</strong>
+  <%= @cc_view.display %>
+</p>
+
+<p>
+  <strong>Default:</strong>
+  <%= @cc_view.default %>
+</p>
+
+<p>
+  <strong>Locked:</strong>
+  <%= @cc_view.locked %>
+</p>
+
+<%= link_to 'Edit', edit_cc_view_path(@cc_view) %> |
+<%= link_to 'Back', cc_views_path %>

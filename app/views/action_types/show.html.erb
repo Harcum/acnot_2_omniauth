@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Id:</strong>
+  <%= @action_type.id %>
+</p>
+
+<p>
+  <strong>Code:</strong>
+  <%= @action_type.code %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @action_type.description %>
+</p>
+
+<p>
+  <strong>Role:</strong>
+  <%= @action_type.role %>
+</p>
+
+<p>
+  <strong>Email text:</strong>
+  <%= @action_type.email_text %>
+</p>
+
+<p>
+  <strong>Email completed text:</strong>
+  <%= @action_type.email_completed_text %>
+</p>
+
+<p>
+  <strong>Days til due:</strong>
+  <%= @action_type.days_til_due %>
+</p>
+
+<%= link_to 'Edit', edit_action_type_path(@action_type) %> |
+<%= link_to 'Back', action_types_path %>

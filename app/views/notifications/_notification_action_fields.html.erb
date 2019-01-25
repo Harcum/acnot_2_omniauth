@@ -1,0 +1,182 @@
+
+
+
+
+<div class="row nested-fields" id="notification_action">	
+	
+	<%= f.hidden_field :created_by, :value => @current_user_id  %> 
+	<%= f.hidden_field :action_status_id, :value => 1 %>
+
+	<div class="col-sm-2">
+		<% if  f.object.new_record? %>
+		 	<%= f.collection_select(:action_type_id, @my_action_types, :id, :code, {:prompt => true}, {:class => 'selected_action'}) %>
+		 <% else %>
+			<b><%= f.object.action_type.code %></b>
+		<% end %>
+	</div>
+	<div class="col-sm-2">		
+		<div class="field">
+			<%= f.label :due_date %>
+			<%= f.date_field :due_date, :required => 'required' %>
+		</div>
+	</div>
+	<div class="col-sm-2">
+		<%= f.label :assigned_to %>
+		<% if f.object.new_record? %>	
+			<%= f.collection_select(:assigned_to, Person.take(0), :id, :full_name, {:prompt => true},{:class => 'assigned_to'}) %>
+		<% else %>
+			<%= f.object.assignee.full_name %>
+		<% end %>
+	</div>
+	<% if !f.object.new_record? %>
+		<div class="col-sm-1">
+			<%= f.label :action_status_id, 'Status'%>
+			<% if f.object.assigned_to == @current_user_id %>
+				<%= f.collection_select(:action_status_id, ActionStatus.all(), :id, :code,  {:class => 'action_status_id'}) %>
+			<% else %><%= f.object.action_status.code %><% end %>
+		</div>
+	<% end %>
+
+<% if  f.object.assigned_to == @current_user_id %><fieldset>
+<% else %><fieldset disabled>	<% end %>
+	<%= render "action_fields", f: f %>
+</fieldset>
+
+	  	<% if f.object.new_record? %>
+		  	<div class="col-sm-1">
+		  		<% if f.object.new_record? %>
+		  		<%= link_to_remove_association button_tag('Remove', type: "button", class: "btn btn-danger btn-xs glyphicon glyphicon-minus") , f %>
+		  		<% end %>
+		  	</div>
+	  	<% end %>
+</div>
+
+<script>
+
+
+
+$(document).ready(function() {
+	
+	
+	updateActionAssignees();
+	
+	console.log('entering action field fixer')
+		
+	$('.selected_action').each(function() {
+		console.log('fixing action id ' + $(this).val());
+		var selected_action_id =  $(this).val();
+		
+		// hide all fields and then show the ones for this action
+		$(this).parent().parent().find("[id^=action]").hide();
+		$(this).parent().parent().find("#action_" + selected_action_id).show();
+		
+		// disable this reason option in other selectors		
+ 		$('.selected_action').each(function() {
+ 			var other_selected_action_id =  $(this).val();
+ 			console.log('other selected action : ' + other_selected_action_id + ' this selected action : ' + selected_action_id);
+			if(selected_action_id != other_selected_action_id){
+				console.log('disabling action : ' + selected_action_id);
+  				$(this).find("option[value='"+selected_action_id+"']").attr('disabled','disabled'); 
+  			}			
+		});
+	});	
+});
+
+
+	
+function updateActionAssignees() {
+	$('.selected_action').each(function(i) {
+		//console.log('found selected action with value ' + $(this).val());
+		//console.log('found selected action with id ' + $(this).prop('id'));
+		var action_id = $(this).val();
+		var student_id = $('#notification_person_id').val();
+		var section_student_id = $('#notification_section_student_id').val();
+		var assignedToId =   $(this).prop('id').replace('action_type_id','assigned_to');	
+      	$.ajax({
+  	  		// this URL already returns data in selector form	
+      		url:'/people/action_assignees',
+      		type: 'GET',
+      		data: { action_id: action_id, student_id: student_id, section_student_id: section_student_id},
+      		success: function (data) {
+            	$("#"+ assignedToId).empty().append(data);
+            	updateCCs();
+      		}
+    	});  
+	});
+}
+
+
+// for some reason the assigned_to id does not take until the prompt option is in there
+
+$('.assigned_to' ).on('change',function(event) {
+		updateCCs(); 
+});
+
+
+// When an item is selected in reason dropdown that cocoon created, fire this.
+// This is a delegate handler because handler is set up before cocoon loads content
+
+$( '.selected_action' ).on('change',function(event) {
+ 
+  // hide all reason fields and show only the ones for the reason_id that is selected
+  // this uses the divs I added in the _fields partial
+  // Note that the colection select is at the same level as _fields so you need to use parent.
+  // And the reason why you need to find by the id of the collection_select is that there may be 
+  // a bunch of these on the same DOM since you can have multiple reasons.
+ 
+  // this is getting fired by HTMLDivElement
+  // should only be fired by HTMLSelectElement Argh!!!!
+  
+  //notification_notification_actions_attributes_0_action_status_id
+    updateActionEmail();
+    
+
+  	var selected_action_id = "#action_" + event.target.selectedOptions.item(0).value;
+  	var parent = $('#'+event.target.id).parent().parent();
+  
+  	parent.find("[id^=action]").hide();
+  	parent.find(selected_action_id).show();
+  	
+  	// update due date
+  	// the due date has a long id made by cocoon
+  	//target id:   notification_notification_actions_attributes_1487981216538_due_date
+  	//due date id: notification_notification_actions_attributes_1487981216538_action_type_id
+  	//assigned to: notification_notification_actions_attributes_1488568821568_assigned_to
+
+	var dueDateId =   event.target.id.replace('action_type_id','due_date');	
+	var assignedToId =   event.target.id.replace('action_type_id','assigned_to');	
+	// in action_fields the action type fields are added as parameters. nasty. I know.
+  	var daysOut = parent.find(selected_action_id).attr( "days_til_due");
+
+  	console.log('days out: ' + daysOut)
+  	// Is this 2017? Do I really have to do this?
+  	var dueDate = new Date(new Date().getTime()+ 864E5*daysOut);
+	document.getElementById(dueDateId).value = formatDate(dueDate);
+	
+	updateActionAssignees();
+	// updateCCs(); do this from ajax call for acion assignees!!!
+});
+
+
+
+
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+
+
+
+
+
+
+</script>

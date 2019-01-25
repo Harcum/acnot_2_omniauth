@@ -1,0 +1,93 @@
+<head><style>
+
+div.datagrid-filter.filter {
+	/*float:left;
+	display:inline;*/
+}
+
+
+div.datagrid-filter label {
+	/*
+	text-align: right;
+	padding-right: 100;
+	
+ display: inline-block; 
+ width: 130px;
+ 
+ 
+ margin: 0;
+ font-weight: bold;*/
+} 
+
+#notifications_grid_name{
+	width: 180px;
+}
+
+#notifications_grid_open_actions{
+	width: 10px;
+}
+
+/*<input class="open_actions boolean_filter" type="checkbox" value="1" name="notifications_grid[open_actions]" id="notifications_grid_open_actions">*/
+
+/*
+div.datagrid-filter input {
+	
+ text-align: left;
+ padding-left: 20000px;
+ margin: 0;
+ 
+} 
+*/
+
+form {
+	display: inline-block;
+	height: 70px;
+}
+
+div.datagrid-actions{
+	display: inline;	
+	width: 160px;
+	padding-left: 0px; /* an overrride */
+}
+
+
+
+
+</style>
+
+
+
+</head>
+
+<% if @grid %>
+	<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" style="display: inline">
+		<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+	</a>
+	<%= datagrid_form_for @grid, :method => :get, :url => notifications_path %>
+	<%= datagrid_table @grid %>
+<% end %>
+
+<script type="text/javascript">
+$('.date_filter').datepicker();
+</script>
+	
+<div id="helpModal" class="modal fade">
+  <div class="modal-dialog">
+  	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="termsLabel" class="modal-title">Help for you</h3>
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+      </div>
+      <div class="modal-body">
+      	<%= Help.find(2).body.html_safe %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+

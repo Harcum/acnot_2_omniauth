@@ -1,0 +1,2 @@
+module EmailProtosHelper
+end

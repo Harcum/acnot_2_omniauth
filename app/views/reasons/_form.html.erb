@@ -1,0 +1,55 @@
+<html>
+	<head>
+    	<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+	</head>
+
+	<body>
+
+
+<%= form_for(reason) do |f| %>
+  <% if reason.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(reason.errors.count, "error") %> prohibited this reason from being saved:</h2>
+
+      <ul>
+      <% reason.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :code %>
+    <%= f.text_field :code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
+
+  <div class="field">
+    <%= f.label :email_text %>
+    <%= f.text_area :email_text, size: '50x10' %>
+  </div>
+
+  <h3>Reason Fields</h3>
+  <div id='reason_fields'>
+    <%= f.fields_for :reason_fields do |rf| %>
+      <%= render 'reason_field_fields', :f => rf %>
+    <% end %>
+    <div class='links'>
+      <%= link_to_add_association 'add reason field', f, :reason_fields %>
+    </div>
+  </div>
+
+
+
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
+</body></html>

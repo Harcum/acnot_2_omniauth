@@ -1,0 +1,174 @@
+
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Academic Notification System</a>
+		</div>
+		
+		<ul class="nav navbar-nav">
+			<li><a href="/notifications">My Notifications</a></li>
+			<li><a href="/notifications/new">New Notification</a></li> 
+			<li><a href="/notification_actions">My Actions</a></li> 
+			<li><a href="/narratives">Student Information</a></li> 
+			<% if @is_admin %>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="action_types">Actions</a></li>
+						<li><a href="reasons">Reasons</a></li>
+						<li><a href="roles">Roles</a></li>
+					</ul>
+				</li>
+			<% end %>
+		</ul>
+			
+		<ul class="nav navbar-nav navbar-right">
+			<li>
+				<% if user_signed_in? %>		
+					<li><a><%= @current_user.email %></a> </li>
+					<li class="active"><%= link_to('Logout', destroy_user_session_path, :method => :delete) %> </li>   
+				<% else %>
+					<%= link_to('Login', new_user_session_path)  %>  
+				<% end %>
+			</li>
+		</ul>
+	</div>
+</nav>
+<div class="container-fluid">
+	<div class="panel-group" id="accordion"> <!-- needs panel wrapper for accordian to work --> 	
+	  	<div class="row">
+	  		<b>
+		  		<div class="col-sm-1"></div>
+		  		<div class="col-sm-2">Student Name:</div>
+		  		<div class="col-sm-1">Session:</div>
+		  		<div class="col-sm-1">Section:</div>
+		  		<div class="col-sm-2">Reason(s):</div>
+		  		<div class="col-sm-1">Status:</div>
+		  		<div class="col-sm-2">Created by:</div>
+		  		<div class="col-sm-1">Created on:</div>
+	  		</b>
+	  	</div>
+	  	
+		<% @notifications.each_with_index do |n, index| %>  
+	  		<div class="row">
+	  			<div class="col-sm-1">
+	  			<!-- this isn't working. leave it out for now
+	  			
+	  				<% if n.emails.any? || n.notes.any? || n.notification_actions.any? %>
+	  					<button class="btn btn-link" data-toggle="collapse" data-target="#collapse<%= index.to_s %>" data-parent="#accordion">Details</button>
+	  				<% else %>
+	  					<button class="btn btn-link disabled">Details</button>
+	  				<% end %>
+	  			--> </div>
+		    	<div class="col-sm-2"><%= n.student.first_name %> <%= n.student.last_name %></div>
+		    	<% if n.section_student_id? %>
+			    	<div class="col-sm-1"><%= n.section.session %></div>
+			    	<div class="col-sm-1"><%= n.section.section %></div>
+			    <% else %>	
+			    	<div class="col-sm-2"></div>
+			    <% end %>
+		    	<div class="col-sm-2"><% n.reasons.each do |r| %><%= r.code %>,<% end %></div>
+		    	<div class="col-sm-1"><%= n.status.code %></div>
+				<div class="col-sm-2"><%= n.creator.first_name %> <%= n.creator.last_name %></div>
+				<div class="col-sm-1"><%= n.created_at.to_date %></div>
+				<div class="col-sm-1"><%= link_to 'View/Edit', edit_notification_path(:id => n.id), class: 'btn btn-link ' %></div>
+		   </div>
+		   
+		   <!-- details panel -->
+	  		<div class="panel">
+		  		<% if n.id == @selected_notification_id %>
+		  			<div id="collapse<%= index.to_s %>" class="panel-collapse collapse in">	
+		  		<% else %>
+		  			<div id="collapse<%= index.to_s %>" class="panel-collapse collapse">
+	  			<% end %>	
+	  			<!-- emails -->	
+	  			<wrapper>
+				<% n.emails.each_with_index do |e, index| %>
+					<!-- print header only if there's data -->
+					<% if index == 0 %>
+						<div class="row"><b>
+							<div class="col-sm-1">Emails(s):</div>
+							<div class="col-sm-2">Sent by:</div>
+							<div class="col-sm-1">Sent on:</div>
+							<div class="col-sm-2">Subject:</div>
+							<div class="col-sm-6">Message:</div>
+						</b></div>
+					<% end %>
+					<div class="row">
+						<div class="col-sm-1"></div>
+						<div class="col-sm-2"><%= e.creator.first_name %> <%= e.creator.last_name %></div>
+						<div class="col-sm-1"><%= e.created_at.to_date %></div>
+						<div class="col-sm-2"><%= e.subject %></div>
+						<div class="col-xs-6"><a href="#" data-toggle="tooltip" title="<%= e.text %>"><%= e.text[0,80]+"...." %></a></div>		
+							
+					</div>
+				<% end %> 	
+				</wrapper>
+				<!-- notes -->
+				<wrapper>
+	        	<% n.notes.each_with_index do |nt, index| %>
+					<% if index == 0 %>
+						<div class="row"><b>
+							<div class="col-sm-1">Note(s):</div>
+							<div class="col-sm-2">Created by:</div>
+							<div class="col-sm-1">Created on:</div>
+							<div class="col-sm-8">Note:</div>
+						</b></div>				
+					<% end %>
+					<style>
+					   .container
+					   {
+					      max-width: 100%;
+					      white-space: nowrap;
+					   }
+					</style>
+					
+					<div class="row">
+						<div class="col-sm-1"></div>
+		    			<div class="col-sm-2"><%= nt.creator.first_name %> <%= nt.creator.last_name %></div>
+		    			<div class="col-sm-1"><%= nt.created_at.to_date %></div>
+		    			<div class="container"><div class="col-sm-8"><%= nt.the_note %></div></div>
+	    			</div>
+	        	<% end %>
+			    </wrapper>
+			    <!-- actions -->
+			    <wrapper>  	
+				<% n.notification_actions.each_with_index do |a, index| %>
+					<% if index == 0 %>
+						<div class="row"><b>
+							<div class="col-sm-1">Action(s):</div>
+							<div class="col-sm-2">Created by:</div>
+							<div class="col-sm-1">Created on:</div>
+							<div class="col-sm-1">Action:</div>
+							<div class="col-sm-1">Status:</div>
+							<div class="col-sm-2">Assigned to:</div>
+							<div class="col-sm-1">Due on:</div>
+							<div class="col-sm-1">Done on:</div>
+						 </b></div>			
+					<% end %>
+					<div class="row">
+						<div class="col-sm-1"></div>
+						<div class="col-sm-2"><%= a.creator.first_name %> <%= a.creator.last_name %></div>
+						<div class="col-sm-1"><%= a.created_at.to_date %></div>
+						<div class="col-sm-1"><%= a.action_type.code %></div>
+						<div class="col-sm-1"><%= a.action_status.code %></div>
+		    			<div class="col-sm-2">
+		    				<% if a.assigned_to %> <%= a.assignee.first_name %> <%= a.assignee.last_name %><% end %>
+		    			</div>
+		      			<div class="col-sm-1">
+		      				<% if a.due_date %><%= a.due_date.to_date %><% end %>
+		      			</div>
+		      			<div class="col-sm-1">
+		      				<% if a.completed_at %><%= a.completed_at.to_date %><% end %>
+		      			</div>	
+					</div>	    			
+	        	<% end %>
+	        	</wrapper>  		
+	        	</div> <!-- this closes div in if/else/end for panel collapse -->
+			</div>
+		<% end %>
+	</div>
+</div>
+
+
+<%= link_to 'New Notification', new_notification_path %>

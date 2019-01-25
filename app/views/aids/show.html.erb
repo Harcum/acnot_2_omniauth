@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Package name:</strong>
+  <%= @aid.package_name %>
+</p>
+
+<p>
+  <strong>Person:</strong>
+  <%= @aid.person_id %>
+</p>
+
+<p>
+  <strong>Amount:</strong>
+  <%= @aid.amount %>
+</p>
+
+<p>
+  <strong>Year:</strong>
+  <%= @aid.year %>
+</p>
+
+<%= link_to 'Edit', edit_aid_path(@aid) %> |
+<%= link_to 'Back', aids_path %>

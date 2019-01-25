@@ -1,0 +1,2 @@
+class CcView < ApplicationRecord
+end

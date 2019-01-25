@@ -1,0 +1,2 @@
+class InformedPerson < ApplicationRecord
+end

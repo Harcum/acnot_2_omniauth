@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Actions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Description</th>
+      <th>Email text</th>
+      <th>Email completed text</th>
+      <th>Days til due</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @action_types.each do |action_type| %>
+      <tr>
+        <td><%= action_type.code %></td>
+        <td><%= action_type.description %></td>     
+        <td><a href="#" data-toggle="tooltip" title="<%= action_type.email_text %>"><%= action_type.email_text[0,30] %></a></td>
+        <td><a href="#" data-toggle="tooltip" title="<%= action_type.email_completed_text %>"><%= action_type.email_completed_text[0,30] %></a></td>     
+        <td><%= action_type.days_til_due %></td>
+        <td><%= link_to 'Show', action_type %></td>
+        <td><%= link_to 'Edit', edit_action_type_path(action_type) %></td>
+        <td><%= link_to 'Destroy', action_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Action', new_action_type_path %>

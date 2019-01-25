@@ -1,0 +1,2 @@
+module EmailPeopleHelper
+end

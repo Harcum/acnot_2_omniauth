@@ -1,0 +1,48 @@
+<div class='nested-fields'>
+  
+						
+						<% if f.object.new_record? %>
+						  	<%= f.hidden_field :created_by, :value => @current_user_id %>
+							<div class="field">
+								<%= f.text_area(:the_note, size: '50x5') %>
+							</div>  
+							<%= link_to_remove_association button_tag('Remove', type: "button", class: "btn btn-danger btn-xs glyphicon glyphicon-minus") , f %>
+						<% else %>
+							<fieldset disabled>
+							<div class="field">
+								<%= f.text_area(:the_note, size: '50x5') %>
+							</div>  
+							created by: <%= f.object.creator.full_name %> on: <%= f.object.created_at.to_date %><br><br>
+							</fieldset>
+						<% end %>
+
+  
+ </div>
+<script>
+	
+	
+	
+  //<textarea ...  id="notification_notes_attributes_0_the_note" cols="50" rows="5">test one</textarea> saved one
+  //<textarea ... id="notification_notes_attributes_1491334567414_the_note" cols="50" rows="5"></textarea> unsaved one
+
+
+// only unsaved notes get displayed full height. Saved ones are locked and can't be removed
+$(document).ready(function() {
+	// jquery style notification_notes_attributes_*_the_note wildcard
+	$('[id^=notification_notes_attributes_][id$=_the_note]').each(function(i) {
+			var id = $(this).attr('id');
+			//console.log('notes holder got id: '+ id + 'length: ' + id.length);
+			if(id.length < 42){
+				$(this).attr("rows", 1);
+				$(this).prop("readonly", true);
+				$(this).closest('#note_fields').find('a').hide();
+			}
+
+	});
+});
+	
+	
+</script>
+
+
+

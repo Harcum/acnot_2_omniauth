@@ -1,0 +1,64 @@
+<html>
+	<head>
+    	<%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+	</head>
+
+	<body>
+
+
+<%= form_for(action_type) do |f| %>
+  <% if action_type.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(action_type.errors.count, "error") %> prohibited this action_type from being saved:</h2>
+
+      <ul>
+      <% action_type.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :code %>
+    <%= f.text_field :code %>
+  </div>
+
+  <div class="field">
+    <%= f.label :description %>
+    <%= f.text_field :description %>
+  </div>
+
+  <div class="field">
+    <%= f.label :email_text %>
+    <%= f.text_area :email_text, size: '50x10' %>
+	</div>	
+
+  <div class="field">
+    <%= f.label :email_completed_text %>
+     <%= f.text_area :email_completed_text, size: '50x10' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :days_til_due %>
+    <%= f.number_field :days_til_due %>
+  </div>
+
+
+  <h3>Action Fields</h3>
+  <div id='action_fields'>
+    <%= f.fields_for :action_fields do |af| %>
+      <%= render 'action_field_fields', :f => af %>
+    <% end %>
+    <div class='links'>
+      <%= link_to_add_association 'add action field', f, :action_fields %>
+    </div>
+  </div>
+
+
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+</body></html>

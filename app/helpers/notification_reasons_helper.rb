@@ -1,0 +1,2 @@
+module NotificationReasonsHelper
+end

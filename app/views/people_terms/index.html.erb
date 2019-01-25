@@ -1,0 +1,51 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Transcript</h1>
+
+<b>Name: </b><%= @people_terms.first.person.first_name %> <%= @people_terms.first.person.last_name %><br/><br/>
+<div class="container-fluid">
+    <% @people_terms.each do |people_term| %>
+    	<div class="row">
+	  		<b><div class="col-sm-2"></div>
+        	<div class="col-sm-7"><%= people_term.term.academic_term %> <%= people_term.term.academic_year %></td></div></b>
+      	</div>	
+	    <div class="row"><b>
+	      <div class="col-sm-1">Course</div>
+	      <div class="col-sm-2">Title</div>
+	      <div class="col-sm-1">Grade</div>
+	      <div class="col-sm-1">Credits</div>
+	      <div class="col-sm-1">Qpoints</div>
+	    </b></div>
+	    <% people_term.transcript_grades.each do |transcript_grade| %>
+			<div class="row">
+	      		<div class="col-sm-1"><%= transcript_grade.course %></div>
+	        	<div class="col-sm-2"><%= transcript_grade.title %></div>
+	        	<div class="col-sm-1"><%= transcript_grade.grade %></div>
+	        	<div class="col-sm-1"><%= transcript_grade.credits %></div>
+	        	<div class="col-sm-1"><%= transcript_grade.qpoints %></div>
+	      	</div>
+	    <% end %>
+		<br/>
+		<div class="row"><b>
+			<div class="col-sm-1"></div>
+	      	<div class="col-sm-1">Attempt</div>
+	      	<div class="col-sm-1">Earned</div>
+	      	<div class="col-sm-1">Total</div>
+	      	<div class="col-sm-1">Gpacrd</div>
+	      	<div class="col-sm-1">Qpoints</div>
+	      	<div class="col-sm-1">Gpa</div>
+	    </b></div>
+	    <% people_term.transcript_gpas.order(:term_cum).reverse_order.each do |transcript_gpa| %>
+			<div class="row">
+				<div class="col-sm-1"><%= transcript_gpa.term_cum %></div>
+				<div class="col-sm-1"><%= transcript_gpa.attempt %></div>
+				<div class="col-sm-1"><%= transcript_gpa.earned %></div>
+				<div class="col-sm-1"><%= transcript_gpa.total %></div>
+				<div class="col-sm-1"><%= transcript_gpa.gpacrd %></div>
+				<div class="col-sm-1"><%= transcript_gpa.qpoints %></div>
+				<div class="col-sm-1"><%= transcript_gpa.gpa %></div>
+	      	</div>
+	    <% end %> 
+	   <br/>
+    <% end %>
+</div>

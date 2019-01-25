@@ -1,0 +1,730 @@
+<html>
+	<head> 	
+    	<style>
+    		label.error {
+  				color: red;
+			}
+			.modal-dialog{
+				height: 100%;
+				background: lightcyan;
+				overflow-y: auto;
+			}
+			.modal-content {
+			    /* 80% of window height */
+			    height: 95%;
+			    overflow-y: auto;
+			}
+			
+			.modal-body {
+			    /* 100% = dialog height, 120px = header + footer */
+			    overflow-y: auto;
+			}
+			iframe {
+			    display: block;       /* iframes are inline by default */
+			    background: #000;
+			    border: none;         /* Reset default border */
+			    height: 100vh;        /* Viewport-relative units */
+			    width: 50vw;
+			}
+    	</style>
+    	
+		<!-- from https://jqueryui.com/autocomplete/ includes jss and css in assets-->
+		<script>
+			$( function() {
+		    	var availableTags = [<% @my_students.all.each do |p|  %>"<%= p.full_name %>",<% end %>];
+		    	$( "#tags" ).autocomplete({
+		      		source: availableTags
+		    	});
+		  	});
+		</script>
+		<script>	  
+			$( "#tags" ).autocomplete({
+				select: function( event, ui ) {
+					console.log('got enter event');
+					console.log('got value: ' + ui.item.label);
+				}
+			});
+		</script> 	
+	</head>
+	<body>	
+		<script>
+			function updateCCs() {
+				// parameters: creator_id=1390&student_id=69118&section_student_id=333017&action_assignee_ids=58378,1234
+				// look  at source to get these  names because they're not obvious
+				// collect all the parameters that go into the query that gets the ccs
+				var creator_id = $('#notification_created_by').val();
+				var student_id = $('#notification_person_id').val();
+				var section_student_id = $('#notification_section_student_id').val();
+				//notification_notification_actions_attributes_1492198514843_assigned_to
+				var action_assignee_ids = '';
+				
+				$('[id^=notification_notification_actions_attributes_][id$=_assigned_to]').each(function(i) {
+					console.log('action assignees got this id : ' + $(this).attr("id"));
+					console.log('and this value : ' + $(this).val());
+					if ($(this).val()){
+						action_assignee_ids += $(this).val() + ",";
+					}
+				});	
+			
+				var action_ids = '';
+				$('.selected_action').each(function(i) {
+					action_ids += $(this).val() + ",";
+				});
+				
+				var reason_ids = '';
+				$('.selected_reason').each(function(i) {
+					reason_ids += $(this).val() + ",";
+				});
+				
+				$.ajax({
+					// this URL already returns data in selector form	
+					// this is the form for dynamic emails:
+					//<input type="checkbox" value="217" name="notification[emails_attributes][1492107935397][person_ids][]" id="notification_emails_attributes_1492107935397_person_ids_217">
+					
+					url:'/cc_views',
+					type: 'GET',
+					data: { creator_id: creator_id, student_id: student_id, section_student_id: section_student_id, action_assignee_ids: action_assignee_ids, reason_ids: reason_ids, action_ids: action_ids},
+					success: function (data) {
+						// the email_ccs follows the text field
+						// id="notification_emails_attributes_1492191492584_text"
+						
+						$("#email_ccs").each(function(i) {
+							// the previous sibling is the text field. snag id from this
+							var email_id = $(this).parent()
+							.find('[id^=notification_emails_attributes_][id$=_text]')
+							.attr("id")
+							.replace("notification_emails_attributes_","").replace("_text","");
+							// substitute the id that cocoon uses for the form for the string "email_id"
+							var tweaked_data = data.replace(/email_id/g, email_id);
+							$(this).empty().append(tweaked_data);
+						}); 
+						
+					} // close success
+				});  // close ajax       	
+			} //close function 
+
+			//<div id="email_ccs">
+			//<input type="hidden" name="notification[emails_attributes][1492114196387][person_ids][]" value="">
+			//<input type="checkbox" value="21" name="notification[emails_attributes][1492114196387][person_ids][]" id="notification_emails_attributes_1492114196387_person_ids_21">Madeleine Wrightson
+			//</div>
+			
+			function updateReasonEmail(){
+				var selected_reason_ids = '';
+				$('.selected_reason').each(function(i) {
+					selected_reason_ids += $(this).val() + ',';
+				});
+				
+				selected_reason_ids = selected_reason_ids.substring(0, selected_reason_ids.length-1);
+				
+				if(selected_reason_ids.length > 0){
+					$.ajax({
+					url:'/reasons/email_string',
+					type: 'GET',
+					data: { ids: selected_reason_ids},
+						success: function (data) {
+						// remember that this is async. If you want to use the data, use it here.
+						document.getElementById('email_reasons').value = data;
+						updateEmailText();
+					}
+					});
+				}
+			}
+			
+			function updateActionEmail(){
+				var selected_action_ids = '';
+				$('.selected_action').each(function(i) {
+					selected_action_ids += $(this).val() +',';
+				});
+				
+				selected_action_ids = selected_action_ids.substring(0, selected_action_ids.length-1);
+				if(selected_action_ids.length > 0){			
+					$.ajax({
+					url:'/action_types/email_string',
+					type: 'GET',
+					data: { ids: selected_action_ids},
+					success: function (data) {	
+						document.getElementById('email_actions').value = data;
+						updateEmailText();    	
+					}
+					});
+				}	
+			}
+			
+			function updateEmailText(){
+				console.log('entering update email text');
+				var email_text = document.getElementById('email_greeting').value; 
+				email_text +=  document.getElementById('email_reasons').value;
+				email_text +=  document.getElementById('email_actions').value;
+				email_text +=  document.getElementById('email_signature').value;
+				$("#new_email_text > textarea").val(email_text);
+			}	
+			
+			function update_section_student_selector(person_id, created_by) {
+				console.log('person id: ' + person_id + ' creator id: ' + created_by);
+				$.ajax({
+					url:'/section_students',
+					type: 'GET',
+					data: { student_id: person_id, created_by: created_by },
+					success: function (data) {
+						$("#notification_section_student_id").append(data);
+					}
+				});  
+			}
+		</script>
+		
+		<!-- THIS IS OUTSIDE OF THE FORM. NECESSARY BECAUSE OTHERWISE THE SUBMIT FOR SEARCH HITS THE MAIN SUBMIT FOR FORM -->
+		<div class="container-fluid">
+			<% if notification.person_id? %> 
+				<div class="row">
+					<h4>Notification Created on <%= notification.created_at.to_date %> by <%= notification.creator.first_name %> <%= notification.creator.last_name %></h4>
+				</div>
+			<% end %>
+			
+			<div class = "well">
+				<div class="row" id="student">
+					<div class="col-md-2" style="background-color:lightcyan;">
+						<h4>
+							<!-- help -->
+							<% if ! notification.person_id? %>
+								<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_select_student">
+									<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+								</a>
+							<% else %>
+							<% end %>	
+							Student
+						</h4>
+					</div>
+				
+					<div class="col-md-1" style="background-color:lightcyan;" id="student_pic">
+						<% if notification.person_id? %>
+							<% if notification.student.photo? %>
+								<%= image_tag url_for(:controller => "people", :action => "show_image", :id => notification.person_id), size: "75x100" %>
+							<% else %>
+								No Image Available
+							<% end %>
+							<%= notification.student.full_name %>
+						<% end %>	
+					</div>
+						
+					<div class="col-md-9" id="student_info">
+						<% if @student_attribute %>
+							<%= render template: "/student_attributes/show.html.erb" %>
+						<% else %>
+						<% end %>
+							<% if notification.person_id? %>
+								<div id="modal-links" style="display: inline;">
+							<% else %>
+								<div id="modal-links" style="display: none;">
+							<% end %>
+								<a data-target="#moreInfoModal" href="#" role="button" class="btn" data-toggle="modal">
+									More info...
+								</a>
+							</div>
+							<div id="seeProfile2" class="modal fade" role="dialog">
+								<div class="modal-dialog">
+									<div class="modal-content" id="seeProfile2inner">
+									</div>
+								</div>
+							</div>
+							<div id='student_info' >
+								<a data-toggle="modal" href="#myModal">
+								</a>	
+							</div>
+							
+							<% if notification.person_id? %>  
+							<% else %>
+								<div class="popup ui-widget" id="user_search_form">
+									<%= form_tag people_search_index_path, :method => 'get', :id => 'user-search' do %>
+										<%= text_field_tag :search, params[:search], :id => "tags" %>
+										<%= hidden_field :created_by,params[:created_by], :value => @current_user_id  %> 
+										<%= submit_tag "Search/Select", :name => nil, class: "btn btn-primary btn-xs" %>
+										<br><%= check_box_tag  :former %>Search former students
+									<% end %>    
+									<div id="users-result">
+									</div>
+								</div> 
+							<% end %>
+						</div>
+				</div> <!-- close row  -->
+			</div> <!-- close well -->
+		</div> <!-- close container fluid -->
+	
+		<script>
+			var frm = $('#user-search');
+			
+			frm.submit(function (ev) {
+				$.ajax({
+					type: frm.attr('method'),
+					url: frm.attr('action'),
+					data: frm.serialize(),
+					success: function (data) {
+						// get an array of the elements with id=result
+						var results = $(data).filter('#result');      
+			
+						// if there are no elements the search returned nothing      	
+						if(results.length == 0){
+							$('#users-result').append('<label class="error">No matching students found</label>');
+							return false;
+						}
+		
+						// if it returned one row, no need to let user select     	
+						if(results.length == 1){	
+							setStudent($(results[0]));
+							return false;
+						}
+					       	
+						// insert rows and show selector screen       
+						// IT'S SUPER IMPORTANT TO 
+						// render :layout => false
+						// IN CONTROLLER BECAUSE OTHERWISE YOU WILL GET MULTIPLE LOADS
+						// OF JS IN APP LAYOUTS!
+						
+						$('#seeProfile2inner').html(data);
+						$('#seeProfile2').modal();
+					} // close success
+				});	// close ajax
+				ev.preventDefault();
+			}); // close submit function
+			
+			// had to make this handler delegate because handler is set up before ajax loads content
+			$( '#seeProfile2' ).on('click','a',function() {
+				setStudent($(this));
+			})
+				
+			function setStudent(thisObj){
+				// the line that was clicked on is $(this) so just get the attributes you need
+				$('#student_name').append(thisObj.attr( "full_name" ));
+				$('#student_info').show();
+				  
+				//console.log("foo: " + thisObj.attr('person_id'))
+				$('<img src="/people/show_image?id=' + thisObj.attr('person_id') +'">').load(function() {
+					thisObj.width(75).height(100).appendTo('#student_pic');
+				});
+				$.ajax({url: "/student_attributes/" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#student_info').append(data); });
+				
+				$.ajax({url: "/people_terms/transcript?person_id=" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#transcript-modal-body').empty().append(data); });
+				
+				$.ajax({url: "/people_terms/bill?person_id=" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#bill-modal-body').empty().append(data); });
+				
+				$.ajax({url: "/notifications/summary_by_student?person_id=" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#notifications-modal-body').empty().append(data); });
+				
+				$.ajax({url: "/people_terms/hist_attendance?person_id=" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#attendance-modal-body').empty().append(data); });
+
+				$.ajax({url: "/aids?person_id=" + thisObj.attr('person_id')})
+				.done(function( data ) {$('#aid-modal-body').empty().append(data); });
+
+				document.getElementById("modal-links").style.display = "inline-block";
+  
+				//$('iframe').attr('src','/narratives/nonav?person_id='+ thisObj.attr('person_id'));
+				  
+				document.getElementById('email_greeting').value = "Dear " + thisObj.attr( "full_name" ) + ",\r\n\r\n";
+				document.getElementById('notification_person_id').value = thisObj.attr('person_id');
+				// you could potentially use getElementById to get values from a generic index for people
+				// instead of using custom attributes
+				// update dropdown to select section student and hide search
+				var creator_id = document.getElementById('notification_created_by').value;
+				update_section_student_selector(thisObj.attr('person_id'),creator_id);      
+				//updateCCs();
+				$("#user_search_form").empty();
+				$('#seeProfile2').modal('hide');
+				$("#new_notification").valid(); // make error message from jquery validate go away
+				return false;
+			}
+		</script>
+	
+		<!-- OPEN FORM -->
+		<%= form_for(notification) do |f| %>
+			<% if notification.errors.any? %>
+		    	<div id="error_explanation">
+					<h2><%= pluralize(notification.errors.count, "error") %> prohibited this notification from being saved:</h2>
+		      		<ul>
+		      			<% notification.errors.full_messages.each do |message| %>
+		        			<li><%= message %></li>
+		      			<% end %>
+		      		</ul>
+		    	</div>
+			<% end %>
+		  	
+			<div class="container-fluid">	
+				
+				<!-- display locked fields in edit -->	
+				<%= f.hidden_field :person_id, :required => true %>
+				<% if notification.id? %>	
+					<%= f.hidden_field :created_by %>
+					<%= f.hidden_field :section_student_id %>
+					
+				<% else %>
+					<%= f.hidden_field :created_by, :value => @current_user_id  %>
+					<%= f.hidden_field :status_id, :value => 2  %>
+				<% end %>
+					
+				<!-- SELECT SECTION -->
+				<% if Person.where(email: current_user.email).take.roles.where(use_ss: 1).take %>
+					<div class = "well">
+						<div class="row" id="section">
+							
+							<div class="col-md-2" style="background-color:lightcyan;">
+								<h4>		
+									<!-- help -->
+									<% if f.object.new_record? %>
+										<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_select_section">
+										<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" /></a>
+									<% elsif  params[:action] == 'edit' %>
+									<% else %>
+									<% end %>	
+									Section
+								</h4>
+							</div>
+							
+						  	<div class="col-md-10">
+								<div id="section-student-selector">
+									<% if !notification.person_id? %>
+										<%= collection_select(:notification, :section_student_id, SectionStudent.take(0), :id, :section, {:prompt => true, :required => true}) %>
+									<% else %>
+										<% if notification.section_student_id? %>
+											<%= notification.section.section %>
+										<% end %>
+									<% end %>
+								</div>	
+						  	</div>			  	
+						</div>
+					</div>
+				<% else %>
+					<%= f.hidden_field :section_student_id, :value => 0 %>
+				<% end %>
+				
+				<!-- SELECT REASONS -->
+				<div class = "well">
+					<div class="row" id="reasons" style="background-color:lavender;">
+						
+						<div class="col-md-2" style="background-color:lightcyan;">
+							<h4>			
+								<!-- help -->
+								<% if f.object.new_record? %>
+									<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_add_reason">
+										<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+									</a>
+									<% elsif  params[:action] == 'edit' %>
+									<% else %>
+								<% end %>
+								Reasons
+								<% if !notification.person_id? %>	
+									<%= link_to_add_association button_tag('Add', type: "button", class: "btn btn-success btn-xs glyphicon glyphicon-plus") , f, :notification_reasons,'data-association-insertion-node' => '#notification_reasons', 'data-association-insertion-method' => "append" %>
+								<% end %>
+							</h4>
+						</div>
+						
+					  	<div class="col-md-10" id="notification_reasons">
+							<%= f.fields_for :notification_reasons do |builder| %>
+								<%= render 'notification_reason_fields', f: builder %>
+							<% end %>
+					  	</div>
+					</div> <!-- CLOSE ROW -->
+				</div> <!-- CLOSE WELL -->
+				
+				<!-- SELECT ACTIONS -->
+				<div class = "well"><div class="row" id="actions" style="background-color:lavender;">
+					
+					<div class="col-md-2" style="background-color:lightcyan;">
+						<h4>
+							<!-- help -->
+							<% if f.object.new_record? %>
+								<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_add_action">
+									<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+								</a>
+							<% elsif  params[:action] == 'edit' %>
+								<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="edit_notification_add_complete_action">
+									<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+								</a>
+							<% else %>
+							<% end %>	
+							Actions
+							<% if params[:action] != 'show' %>
+						      <%= link_to_add_association button_tag('Add', type: "button", class: "btn btn-success btn-xs glyphicon glyphicon-plus") , f, :notification_actions,'data-association-insertion-node' => '#notification_actions', 'data-association-insertion-method' => "append" %>
+							<% end %>
+						</h4>
+					</div>
+					
+				  	<div class="col-md-10" id="notification_actions">
+						<%= f.fields_for :notification_actions do |builder| %>
+							<%= render 'notification_action_fields', f: builder %>
+						<% end %>
+				  	</div>
+				  	
+				</div> <!-- CLOSE ROW -->
+			</div> <!-- CLOSE WELL -->
+				
+				<!-- EMAILS -->
+				<div class = "well">
+					<div class="row" id="reasons" style="background-color:lavender;">
+						<div class="col-md-2" style="background-color:lightcyan;">
+							<h4>
+								<!-- help -->
+								<% if f.object.new_record? %>
+									<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_email">
+										<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+									</a>
+								<% elsif  params[:action] == 'edit' %>
+									<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="edit_notification_add_additional_email">
+										<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+									</a>
+								<% else %>
+								<% end %>	
+								Emails
+								<% if params[:action] != 'show' %>
+								 <%= link_to_add_association button_tag('Add', type: "button", class: "btn btn-success btn-xs glyphicon glyphicon-plus") , f, :emails,'data-association-insertion-node' => '#emails', 'data-association-insertion-method' => "append" %>
+								<% end %>
+							</h4>
+						</div>
+					
+						<div class="col-md-10" id="emails" >
+							<%= f.fields_for :emails do |e| %>
+							  <%= render 'email_fields', :f => e %>
+							<% end %>
+						</div>
+						
+					</div> <!-- CLOSE ROW -->
+				</div> <!-- CLOSE WELL --> 
+	
+				<!-- NOTES -->
+				<div class = "well"><div class="row" id="reasons" style="background-color:lavender;">
+					<div class="col-md-2" style="background-color:lightcyan;">
+						<h4>
+							<!-- help -->
+							<% if f.object.new_record? %>
+								<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_note">
+									<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" /
+								</a>
+							<% elsif  params[:action] == 'edit' %>
+								<a data-target="#helpModal" href="#" role="button" class="btn" data-toggle="modal" data-focus="new_notification_note">
+									<span style="font-size:1.5em;" class="glyphicon glyphicon-question-sign" />
+								</a>
+							<% else %>
+							<% end %>	
+							Notes
+							<% if params[:action] != 'show' %>
+								<%= link_to_add_association button_tag('Add', type: "button", class: "btn btn-success btn-xs glyphicon glyphicon-plus") , f, :notes,'data-association-insertion-node' => '#notes', 'data-association-insertion-method' => "append" %>
+							<% end %>
+						</h4>
+					</div>
+					
+					<div class="col-md-10" id="notes">
+						<%= f.fields_for :notes do |n| %>
+						  <%= render 'note_fields', :f => n %>
+						<% end %>
+					</div>
+					
+				</div> <!-- CLOSE ROW -->
+			</div> <!-- CLOSE WELL -->
+			
+			</div> <!-- CLOSE CONTAINER FLUID -->
+			
+			<script>
+				
+				$("#new_notification").validate({
+					submitHandler: function(form) {
+						// do other things for a valid form
+						console.log('validating...');
+						form.submit();
+					},
+					ignore: [],
+					rules: {
+						"notification[section_student_id]": {required: true},
+						"notification[person_id]": {required: true},
+						"notification[notification_reasons_attributes][0][reason_id]" : {required: true}
+					},
+					messages: {
+						"notification[person_id]": "You need to select a student"
+					}
+				});
+
+				$( '#section-student-selector' ).on('change',function(event) {updateCCs();});
+				$( '#section-student-selector' ).on('change',function(event) {updateSubject();});
+
+				$(document).ready(function() {
+					
+					$("#former").change(function() {
+					    if(this.checked) {
+					        console.log('checked');
+					        var availableTags = [<% @my_former_students.all.each do |p|  %>"<%= p.full_name %>",<% end %>];
+					    	$( "#tags" ).autocomplete({
+					      		source: availableTags
+					    	});
+					    }else{
+					    	console.log('unchecked');
+					    	var availableTags = [<% @my_students.all.each do |p|  %>"<%= p.full_name %>",<% end %>];
+		    				$( "#tags" ).autocomplete({
+		      					source: availableTags
+		    				});
+					    }
+					});
+					
+					$('#openBtn').click(function(){
+						$('#myModalxx').modal({show:true})
+					});
+					
+					$('#helpModal').on('shown.bs.modal', function(e) {
+						var recipient = $(e.relatedTarget).data('focus');
+						console.log('focusing on ' + '#'+recipient);
+						  
+						$(this).find('#'+recipient).focus(); 
+						// $(this).animate({scrollTop: $("#EmailInput").offset().top}, 500); 
+						//$(this).scrollTop( $("#EmailInput").offset().top );  
+					});
+				
+					$(function () {
+						$('[data-toggle="popover"]').popover()
+					});
+					
+					$('#notification_actions').on("cocoon:after-remove", function() {
+						updateActionEmail();
+						updateCCs();
+					});
+				
+					$('#notification_reasons').on("cocoon:after-remove", function() {
+						updateReasonEmail();
+						updateCCs();
+					});
+				  
+					$('#emails').on('cocoon:after-insert', function(e, insertedItem){
+						var section_id = $('#notification_section_student_id').val();
+						var section_name = $('#section-student-selector').text();
+						console.log('after email add got section: ' + section + ' with name ' + section_name);
+						
+						$('[id^=notification_emails_attributes_][id$=_subject]').each(function(i) {
+							if ($(this).val() == 'xxx'){
+								$(this).val('Follow up: Academic Notification for ' + section_name.trim());
+							}
+						});	
+						
+						var full_name = $('#student_pic').text().trim();
+						document.getElementById('email_greeting').value = "Dear " + full_name + ",\r\n\r\n";
+						updateEmailText();
+						updateCCs();
+					});  
+					
+					$( '#reasons-actions-holder' ).on('change',function(event) {
+						//updateCCs();
+					}); 
+				});
+			</script>
+			
+			<div class="actions">
+				<% if params[:action] == 'new' %>
+			    	<%= f.submit "Create and Send Notification", class: "btn btn-success btn-xs glyphicon glyphicon-plus"%>
+				<% elsif params[:action] == 'edit' %>
+			    	<%= f.submit "Update and Send Notification", class: "btn btn-success btn-xs glyphicon glyphicon-plus"%>
+				<% end %>
+			 </div>
+		<% end %> <!-- CLOSE FORM -->
+		
+		<input type="hidden" id="email_greeting" value= "">
+		<input type="hidden" id="email_reasons" value= "">
+		<input type="hidden" id="email_actions" value= "">
+		<input type="hidden" id="email_signature" value= "Sincerely, <%= Person.where(id: @current_user_id).take.full_name %>">
+		
+	</body>
+</html>
+
+<!-- HELP Modal -->
+<div id="helpModal" class="modal fade">
+  <div class="modal-dialog">
+  	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="termsLabel" class="modal-title">Help for you</h3>
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+      </div>
+      <div class="modal-body">
+      	<%= Help.find(1).body.html_safe %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- More Info Modal -->
+<div class="modal fade" id="moreInfoModal" role="dialog" aria-hidden="true" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body">
+
+		  <ul class="nav nav-tabs">
+		    <li class="active"><a data-toggle="tab" href="#home">Transcript</a></li>
+		    <% if @show_financials %>
+		    	<li><a data-toggle="tab" href="#menu1">Charge Credit</a></li>
+		    <% end %>
+		    <li><a data-toggle="tab" href="#menu2">Attendance</a></li>
+		    <li><a data-toggle="tab" href="#menu3">Notifications</a></li>
+		    <% if @show_financials %>
+		    	<li><a data-toggle="tab" href="#menu4">Financial Aid</a></li>
+		    <% end %>
+		  </ul>
+		
+		  <div class="tab-content">
+		    <div id="home" class="tab-pane fade in active">
+		      <div id="transcript-modal-body">
+		      	<% if notification.person_id? %>
+		      	<% if @people_terms_transcripts.first %>
+		      		<%= render template: "/people_terms/transcript.html.erb" %>
+		      	<% end %><% end %>
+		      </div>   
+		    </div>
+		    
+		    <div id="menu1" class="tab-pane fade">
+		      <div id="bill-modal-body">
+		      	<% if notification.person_id? %>
+		      	<% if @people_terms_bills.first %>
+		      		<%= render template: "/people_terms/bill.html.erb" %>
+		      	<% end %><% end %>
+		      </div>
+		    </div>
+		    
+		    <div id="menu2" class="tab-pane fade">
+		      <div id="attendance-modal-body">
+		      	<% if notification.person_id? %>
+		      		<%= render template: "/people_terms/hist_attendance.html.erb" %>
+		       	<% end %>
+		      </div>
+		    </div>
+		    
+		    <div id="menu3" class="tab-pane fade">
+		      <div id="notifications-modal-body">
+		      	<% if notification.person_id? %>
+		      		<%= render template: "/notifications/summary_by_student.html.erb" %>
+		       	<% end %>
+		      </div>
+		    </div>
+		    
+		 	<div id="menu4" class="tab-pane fade">
+		      <div id="aid-modal-body">
+		      	<% if notification.person_id? %>
+		      		<%= render template: "/aids/index.html.erb" %>
+		       	<% end %>
+		      </div>
+		    </div>
+		    
+		  </div>
+		</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+<%= form_for(aid) do |f| %>
+  <% if aid.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(aid.errors.count, "error") %> prohibited this aid from being saved:</h2>
+
+      <ul>
+      <% aid.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :package_name %>
+    <%= f.text_field :package_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :person_id %>
+    <%= f.number_field :person_id %>
+  </div>
+
+  <div class="field">
+    <%= f.label :amount %>
+    <%= f.number_field :amount %>
+  </div>
+
+  <div class="field">
+    <%= f.label :year %>
+    <%= f.number_field :year %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

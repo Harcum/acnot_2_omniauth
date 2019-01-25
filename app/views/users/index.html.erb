@@ -1,0 +1,67 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Users</h1>
+
+<div class="container-fluid">	
+  	<div class="row">
+  		<b>
+    		<div class="col-sm-2">name</div>
+    		<div class="col-sm-2">email</div>
+    		<div class="col-sm-1"># logins</div>
+    		<div class="col-sm-1">last login</div>
+    		<div class="col-sm-1">from</div>
+    		<div class="col-sm-1">created on</div>
+    		<div class="col-sm-1">is admin</div>
+  		</b>
+  	</div>
+	  	
+	  	
+    <% @users.each_with_index do |user,index| %>
+    	<div class="row">
+    		<div class="col-sm-2">
+    			<% if user.person %>
+					<%= user.person.full_name %>
+				<% end %>
+			</div>
+    		<div class="col-sm-2">
+				<%= user.email %>
+			</div>
+    		<div class="col-sm-1">
+    			<%= user.sign_in_count %>			
+    		</div>
+    		<div class="col-sm-1">
+    			<% if user.current_sign_in_at %>
+    				<%= user.current_sign_in_at.to_date	%>		
+    			<% else %>-
+    			<% end %>	
+    		</div>
+    		<div class="col-sm-1">
+    			<%= user.current_sign_in_ip %>			
+    		</div>
+    		<div class="col-sm-1">
+    			<%= user.created_at.to_date	%>			
+    		</div>
+    		<div class="col-sm-1">
+    			<%= user.admin %>			
+    		</div>
+    		<div class="col-sm-1">
+    			<%= link_to 'Show', user %>			
+    		</div>
+    		<div class="col-sm-1">
+    			<%= link_to 'Edit', edit_user_path(user) %>			
+    		</div>
+    		<div class="col-sm-1">
+    			<%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %>
+    		</div>
+		</div>
+    <% end %>
+
+
+
+
+<br>
+
+
+
+
+<%= link_to 'New User', '/users/sign_up' %>

@@ -1,0 +1,31 @@
+
+<div class="col-md-3">
+	<div class = 'row'><strong><%= @student_attribute.full_name %></strong></div>
+	<div class = 'row'><strong>ID:</strong><%= @student_attribute.people_code_id %></div>
+	<div class = 'row'><strong>Birth Date:</strong><%= @student_attribute.birth_date %></div>	
+	<div class = 'row'><strong>Curriculum:</strong><%= @student_attribute.curriculum %></div>
+	<div class = 'row'><strong>Advisor:</strong><%= @student_attribute.advisor %></div>
+	<div class = 'row'><strong>Matric Date:</strong><%= @student_attribute.matric_date %></div>
+</div>
+
+<div class="col-md-3">
+	<div class = 'row'><strong><%= @student_attribute.resident_commuter %></strong></div>
+	<div class = 'row'><strong>Home Address:</strong></div>
+	<div class = 'row'><%= @student_attribute.address_line_1 %></div>
+	<div class = 'row'><%= @student_attribute.address_line_2 %></div>
+	<div class = 'row'><%= @student_attribute.city %>, <%= @student_attribute.state %> <%= @student_attribute.zip_code %></div>	
+	<div class = 'row'><strong>Phone Numbers:</strong></div>
+	<div class = 'row'><%= @student_attribute.phone_numbers %></div>
+</div>
+
+<div class="col-md-3">
+	<div class = 'row'><strong>Emergency Contacts:</strong></div>
+	<div class = 'row'><%= @student_attribute.emergency_contact_name %></div>
+	<div class = 'row'><%= @student_attribute.emergency_contact_number %></div>
+	<div class = 'row'><%= @student_attribute.emergency_contact_relationship %></div>
+	<div class = 'row'><strong>Emails:</strong></div>
+	<div class = 'row'><%= @student_attribute.personal_email %></div>
+	<div class = 'row'><%= @student_attribute.harcum_email %></div>
+</div>
+
+  

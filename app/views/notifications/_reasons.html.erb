@@ -1,0 +1,7 @@
+		<% if n.reasons.count == 1 %>
+			<%= n.reasons.first.code %>
+		<% else %>
+			<a href="#" data-toggle="tooltip" title="<% n.reasons.each do |r| %><%= r.code %>
+<% end %>"><%= n.reasons.first.code %>.....</a>
+		<% end %>
+	

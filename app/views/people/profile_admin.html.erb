@@ -1,0 +1,59 @@
+<h1>Editing Person</h1>
+
+<%= form_for(@profile_admin) do |f| %>
+  <% if @profile_admin.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@my_profile.errors.count, "error") %> prohibited this person from being saved:</h2>
+
+      <ul>
+      <% @profile_admin.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<%= image_tag url_for(:controller => "people", :action => "show_thumb", :id => @profile_admin.id), size: "56x75" %>
+
+  <div class="field">
+    <%= f.label :first_name %>
+    <%= f.text_field :first_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :last_name %>
+    <%= f.text_field :last_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :username %>
+    <%= f.text_field :username %>
+  </div>
+
+  <div class="field">
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+  </div>
+  
+<div class = "field">
+	<%= f.label :default_cc %>
+	<%= f.check_box :default_cc %>
+</div>
+
+<div class = "field">
+	<%= f.label :lock_cc %>
+	<%= f.check_box :lock_cc %>
+</div>
+
+
+
+<b>Available Roles</b><br/>
+ <%=  f.collection_check_boxes(:role_ids, Role.all, :id, :code) %><br/>
+
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
+

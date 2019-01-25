@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+
+
+<p>
+  <strong>Code:</strong>
+  <%= @role.code %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @role.description %>
+</p>
+
+<p>
+  <strong>Default Assignee:</strong>
+  <% if @role.default_assignee %>
+  	<%= @role.default_assignee.full_name %>
+  <% else %>-
+  <% end %>
+</p>
+
+
+<p>
+  <strong>Use ss:</strong>
+  <%= @role.use_ss %>
+</p>
+
+<%= link_to 'Edit', edit_role_path(@role) %> |
+<%= link_to 'Back', roles_path %>

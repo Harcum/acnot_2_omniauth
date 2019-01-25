@@ -1,0 +1,17 @@
+   <% @cc_views.each do |cc_view| %>
+    	<input type="checkbox" value="<%= cc_view.id %>" name="notification[emails_attributes][email_id][person_ids][]" id="notification_emails_attributes_email_id_person_ids_<%= cc_view.id %>" 
+    	<% if cc_view.locked == 1 %>disabled <% end %>
+    	<% if cc_view.default == 1 %>checked <% end %>>		
+    	<%= cc_view.display %><br> 
+    	
+    	<!-- the disabled above wont submit in form so do cheesery -->
+    	<% if cc_view.locked == 1 %>
+			<input type="hidden" value="<%= cc_view.id %>" name="notification[emails_attributes][email_id][person_ids][]" id="notification_emails_attributes_email_id_person_ids_<%= cc_view.id %>" 
+    		<% if cc_view.default == 1 %>checked <% end %>>	
+    	<% end %>
+    	
+    <% end %>
+    
+
+
+<input type="hidden" name="my_check" value="1" />

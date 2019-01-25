@@ -1,0 +1,46 @@
+<h1>My Profile</h1>
+
+<%= form_for(@my_profile) do |f| %>
+  <% if @my_profile.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@my_profile.errors.count, "error") %> prohibited this person from being saved:</h2>
+
+      <ul>
+      <% @my_profile.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="field">
+    <%= f.label :first_name %>
+    <%= f.text_field :first_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :last_name %>
+    <%= f.text_field :last_name %>
+  </div>
+  
+<div class = "field">
+	<%= f.label :default_cc , "cc: me on notification emails?" %>
+	<%= f.check_box :default_cc %>
+</div>
+
+<div class = "field">
+	<%= f.label  :lock_cc, "Lock this setting?" %>
+	<%= f.check_box :lock_cc %>
+</div>
+
+  <div class="actions">
+    <%= f.submit "Update"%>
+  </div>
+<% end %>
+
+<br>
+
+<%= link_to "<button>Change my Password</button>".html_safe, edit_user_registration_path %>
+
+

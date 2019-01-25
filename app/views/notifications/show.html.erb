@@ -1,0 +1,34 @@
+<head><style>
+.main-header {
+    display: inline-block;
+    width: 100%;
+    height: 150px;
+    background-position: center center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+div.datagrid-filter {
+	float:left;
+}
+
+
+
+</style></head>
+
+<fieldset disabled>
+<%= render 'form', notification: @notification %>
+</fieldset>
+
+
+<script>
+
+$(window).load(function() {
+	$('#outer').attr("disabled","true");
+});
+	
+
+
+
+</script>
+

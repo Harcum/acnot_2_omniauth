@@ -1,0 +1,24 @@
+
+<!-- if it's not a new record, open field hash and display -->
+<% if !f.object.new_record? %>	
+	<%= f.fields_for :fields,OpenStruct.new(f.object.fields) do |builder| %>
+		<% f.object.action_type.action_fields.all.each do |field| %>
+			<%= render "#{field.field_type}",field: field, f: builder%>
+		<% end %>
+	<% end %>
+<% else %>
+<!-- otherwise make a holder for fields. They are turned on and off by jquery -->
+	<%= f.fields_for :fields do |builder| %>
+		<% ActionType.all.each do |r| %>
+			<div id='action_<%= r.id %>' role_id='<%= r.role_id %>' days_til_due='<%= r.days_til_due %>' style="display: none;" >
+				<% r.action_fields.all.each do |field| %>
+					<%= render "#{field.field_type}",field: field, f: builder%>
+				<% end %>
+			</div>
+		<% end %>
+	<% end %>
+<% end %>
+
+
+
+

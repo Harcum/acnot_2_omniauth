@@ -1,0 +1,28 @@
+@import "bootstrap";
+@import "bootstrap-sprockets";
+@import 'bootstrap/glyphicons';
+
+.tooltip,
+.tooltip-inner
+ {
+    font-family: "Lucida Console", courier !important;
+    color: #c00;
+ }
+
+
+
+
+/* unvisited link */
+ul.nav > li > a{
+    color: white !important;
+    background-color: #5a2b81 !important;
+}
+
+/* mouse over link */
+ul.nav > li > a:hover,
+ul.nav > li > a:active,
+ul.nav > li > a.active
+ {
+    color: white !important;
+    background-color: #6f54a3 !important;
+}

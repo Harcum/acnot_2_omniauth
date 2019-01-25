@@ -1,0 +1,5 @@
+	<% @people.each do |person| %>		
+		<p id="result" person_id=<%= person.id %> full_name="<%= person.first_name %> <%= person.last_name %>"><%= person.first_name %> <%= person.last_name %>
+			<%= image_tag url_for(:controller => "people", :action => "show_thumb", :id => person.id), size: "56x75" %>
+		</p>	
+	<% end %>	

@@ -1,0 +1,2 @@
+module PersonAssistantsHelper
+end

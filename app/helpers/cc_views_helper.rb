@@ -1,0 +1,2 @@
+module CcViewsHelper
+end

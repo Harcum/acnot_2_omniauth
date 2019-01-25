@@ -1,0 +1,12 @@
+	<div class="container-fluid">
+		<div class="row">
+			<h4>Select Student</h4>
+		</div>
+	</div>
+	
+	<% @people.each do |person| %>		
+		<a href="#" id="result" person_id=<%= person.id %> email=<%= person.email %> full_name="<%= person.first_name %> <%= person.last_name %>" first_name="<%= person.first_name %>" last_name="<%= person.last_name %>">
+			<%= image_tag url_for(:controller => "people", :action => "show_thumb", :id => person.id), size: "56x75" %><br>
+			<%= person.first_name %> <%= person.last_name %>
+		</a><br><br>
+	<% end %>	

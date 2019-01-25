@@ -1,0 +1,54 @@
+<!-- from https://jqueryui.com/autocomplete/ includes jss and css in assets-->
+
+<head>
+
+  <script>
+  $( function() {
+    var availableTags = [<% @role_users.all.each do |p|  %>"<%= p.full_name %>",<% end %>];
+    
+    $( "#tags" ).autocomplete({
+      source: availableTags
+    });
+  } );
+  </script>
+  <script>
+  
+ $( "#tags" ).autocomplete({
+  select: function( event, ui ) {
+  	console.log('got enter event');
+    console.log('got value: ' + ui.item.label);
+    var availableTags = [<% @role_users.all.each do |p|  %>"<%= p.full_name %>",<% end %>];
+    var availableIDs = [<% @role_users.all.each do |p|  %><%= p.id %>,<% end %>];
+    var id = availableIDs[availableTags.indexOf(ui.item.label)];
+    console.log('got id: ' + availableIDs[availableTags.indexOf(ui.item.label)]);
+    
+  	//field looks like this
+    //id="role_people_roles_attributes_1507306305594_person_id" 
+    
+    $('[id^=role_people_roles_attributes_][id$=_person_id]').val(id);
+    
+
+  }
+});
+	
+</script>
+</head>
+
+<div class='nested-fields'>
+	<div class="row">
+		<div class="col-md-2">
+  			<% if  f.object.new_record? %>				 
+				    <%= f.hidden_field :person_id %>
+				 <div class="ui-widget">
+  					<input id="tags">
+				</div>
+			<% else %>
+				<b><% if f.object.person %><%= f.object.person.full_name %><% end %></b>
+			<% end %>
+  		</div>
+ 		<div class="col-md-2">
+    		<%= link_to_remove_association "remove person", f %>
+    	</div>
+    </div>
+</div>
+  

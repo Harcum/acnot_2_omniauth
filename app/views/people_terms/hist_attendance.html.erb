@@ -1,0 +1,45 @@
+<script>
+			$(document).ready(function() {
+					
+					$("#show_historical").change(function() {
+					    if(this.checked) {
+					        $('#oldterm').show();
+					    }else{
+					    	$('#oldterm').hide();
+					    }		    
+					});
+			});
+	
+</script>	
+
+<br><%= check_box_tag  :show_historical %>Show historical attendance
+
+<% if @people_terms_hist_attendances.first %>
+	<h1>Attendance</h1>
+	
+	<b>Name: </b><%= @people_terms_hist_attendances.first.person.first_name %> <%= @people_terms_hist_attendances.first.person.last_name %><br/><br/>
+	<div class="container-fluid">
+	    <% @people_terms_hist_attendances.each do |people_term| %>
+		    <% if people_term.term.current == 0 %><div id = "oldterm" style="display:none"><% else %><div><% end %>
+		    	<div class="row">
+			  		<b><div class="col-sm-2"></div>
+		        	<div class="col-sm-7"><br/><%= people_term.term.academic_term %> <%= people_term.term.academic_year %></td></div></b>
+		      	</div>	
+			    <div class="row"><b>
+			      <div class="col-sm-4">Course</div>
+			      <div class="col-sm-2">Present</div>
+			      <div class="col-sm-2">Absent</div>
+			    </b></div>
+			    <% people_term.hist_attendances.each do |attendance| %>
+					<div class="row">
+			      		<div class="col-sm-4"><%= attendance.section %></div>
+			        	<div class="col-sm-2"><%= attendance.present %></div>
+			        	<div class="col-sm-2"><%= attendance.absent %></div>
+			      	</div>
+			    <% end %>
+			</div>
+	    <% end %>
+	</div>
+
+<% end %>
+

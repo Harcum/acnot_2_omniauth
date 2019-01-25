@@ -1,0 +1,76 @@
+
+	<!-- cocoon looks for this classname to remove association -->
+	<div class="row nested-fields" id='notification_reason'>
+		<div class="col-sm-2">
+			 <% if  f.object.new_record? %>
+				<%= f.collection_select(:reason_id, @my_reasons, :id, :code,  {:prompt => true, :required => true}, {:class => 'selected_reason'}) %>
+			<% else %>
+				<b><%= f.object.reason.code %></b>
+			<% end %>
+		</div>  	
+		
+		 <% if  f.object.new_record? %><fieldset>
+		 <% else %><fieldset disabled>	<% end %>
+		
+		<%= render "reason_fields", f: f %>
+		</fieldset>
+		
+		
+		<% if f.object.new_record? %>
+		  	<div class="col-sm-1">
+		  		<%= link_to_remove_association button_tag('Remove', type: "button", class: "btn btn-danger btn-xs glyphicon glyphicon-minus") , f %>
+		  	</div>
+		  <% end %>
+	</div>
+ 
+<script>
+
+
+$("form").submit(function() {
+
+   //alert( "Handler for .submit() called." );
+   $(this).find("[remove_later=true]").remove();
+
+});
+
+$( '.selected_reason').on('change',function(event) {
+ 
+ 	
+  // hide all reason fields and show only the ones for the reason_id that is selected
+  // this uses the divs I added in the _fields partial
+  // Note that the colection select is at the same level as _fields so you need to use parent.
+  // And the reason why you need to find by the id of the collection_select is that there may be 
+  // a bunch of these on the same DOM since you can have multiple reasons.
+  
+  
+  // this is getting fired by HTMLDivElement
+  // should only be fired by HTMLSelectElement Argh!!!!
+
+  	console.log('fire reason change selected: ' + event.target.selectedOptions.item(0).value + 'target: ' +event.target.id);
+	updateReasonEmail();
+    updateCCs();
+  	var selected_reason_tag = "#reason_" + event.target.selectedOptions.item(0).value; 	
+	// when hash gets built you can't have fields in form  	
+  	$('#'+event.target.id).parent().parent().find("[id^=reason]").hide().attr('remove_later', true);
+  	$('#'+event.target.id).parent().parent().find(selected_reason_tag).show().attr('remove_later', false);
+  	remove_duplicates();
+});
+
+$(document).ready(function() {
+	remove_duplicates();
+});
+
+function remove_duplicates() {
+	$('.selected_reason').each(function() {
+		var selected_reason_id =  $(this).val();		
+ 		$('.selected_reason').each(function() {
+ 			var other_selected_reason_id =  $(this).val();
+			if(selected_reason_id != other_selected_reason_id){
+  				$(this).find("option[value='"+selected_reason_id+"']").attr('disabled','disabled'); 
+  			}			
+		});
+	});	
+}
+
+
+</script>

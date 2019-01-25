@@ -1,0 +1,21 @@
+
+<!-- a not so elegant way to id saved reason fields -->
+<% if !f.object.new_record? %>	
+	<%= f.fields_for :fields,OpenStruct.new(f.object.fields) do |builder| %>
+		<% f.object.reason.reason_fields.all.each do |field| %>
+			<%= render "#{field.field_type}",field: field, f: builder%>
+		<% end %>
+	<% end %>
+<% else %>
+<!-- a holder for fields. They are turned on and off by jquery -->
+	<%= f.fields_for :fields do |builder| %>
+		<% Reason.all.each do |r| %>
+			<div id='reason_<%= r.id %>' style="display: none;" >
+				<% r.reason_fields.all.each do |field| %>
+					<%= render "#{field.field_type}",field: field, f: builder%>
+				<% end %>
+			</div>
+		<% end %>
+	<% end %>
+<% end %>
+
